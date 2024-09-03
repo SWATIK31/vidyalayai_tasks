@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
+import PropTypes from 'prop-types';
 
 const PostContainer = styled.div(() => ({
   width: '300px',
@@ -12,6 +12,9 @@ const PostContainer = styled.div(() => ({
 
 const CarouselContainer = styled.div(() => ({
   position: 'relative',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
 const Carousel = styled.div(() => ({
@@ -22,11 +25,11 @@ const Carousel = styled.div(() => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-  position: 'relative',
+  scrollSnapType: 'x mandatory',
 }));
 
 const CarouselItem = styled.div(() => ({
-  flex: '0 0 auto',
+  flex: '0 0 100%',
   scrollSnapAlign: 'start',
 }));
 
@@ -46,13 +49,19 @@ const Content = styled.div(() => ({
 
 const Button = styled.button(() => ({
   position: 'absolute',
-  bottom: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
   backgroundColor: 'rgba(255, 255, 255, 0.5)',
   border: 'none',
   color: '#000',
   fontSize: '20px',
   cursor: 'pointer',
   height: '50px',
+  width: '50px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 1,
 }));
 
 const PrevButton = styled(Button)`
@@ -68,8 +77,9 @@ const Post = ({ post }) => {
 
   const handleNextClick = () => {
     if (carouselRef.current) {
+      const width = carouselRef.current.offsetWidth;
       carouselRef.current.scrollBy({
-        left: 50,
+        left: width,
         behavior: 'smooth',
       });
     }
@@ -77,8 +87,9 @@ const Post = ({ post }) => {
 
   const handlePrevClick = () => {
     if (carouselRef.current) {
+      const width = carouselRef.current.offsetWidth;
       carouselRef.current.scrollBy({
-        left: -70,
+        left: -width,
         behavior: 'smooth',
       });
     }
@@ -87,6 +98,7 @@ const Post = ({ post }) => {
   return (
     <PostContainer>
       <CarouselContainer>
+        <PrevButton onClick={handlePrevClick}>&#10094;</PrevButton>
         <Carousel ref={carouselRef}>
           {post.images.map((image, index) => (
             <CarouselItem key={index}>
@@ -94,7 +106,6 @@ const Post = ({ post }) => {
             </CarouselItem>
           ))}
         </Carousel>
-        <PrevButton onClick={handlePrevClick}>&#10094;</PrevButton>
         <NextButton onClick={handleNextClick}>&#10095;</NextButton>
       </CarouselContainer>
       <Content>
@@ -107,12 +118,14 @@ const Post = ({ post }) => {
 
 Post.propTypes = {
   post: PropTypes.shape({
-    content: PropTypes.any,
-    images: PropTypes.shape({
-      map: PropTypes.func,
-    }),
-    title: PropTypes.any,
-  }),
+    title: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+    images: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
 };
 
 export default Post;
